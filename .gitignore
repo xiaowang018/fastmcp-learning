@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# 本地数据与密钥
+*.db
+*.sqlite3
+.env
+.env.*
+!.env.example
+
+# 系统
+.DS_Store
+Thumbs.db

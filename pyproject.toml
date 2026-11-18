@@ -1,0 +1,45 @@
+[project]
+name = "fastmcp-learning"
+version = "0.1.0"
+description = "FastMCP 4.2 从 0 到 1 学习案例库：22 个可运行案例"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["fastmcp>=4.2.1,<5"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4",
+    "pytest-asyncio>=1.0",
+    "pytest-timeout>=2.3",
+    "ruff>=0.9",
+]
+# 0206 需要：uv sync --group api
+api = ["fastapi>=0.163", "uvicorn>=0.30"]
+# 0304 需要：uv sync --group apps
+apps = ["fastmcp[apps]>=4.2.1,<5"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+minversion = "8.4"
+addopts = "--import-mode=importlib -m \"not manual and not network\""
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+timeout = 30
+markers = [
+    "network: 需要访问外网的测试（默认不跑）",
+    "apps: 需要 uv sync --group apps 的测试",
+    "manual: 会修改本机配置或需要人工确认的测试",
+    "slow: 耗时超过 3 秒的测试",
+    "port: 需要绑定本地端口的测试",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]

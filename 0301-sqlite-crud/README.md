@@ -37,7 +37,7 @@ CREATE TABLE tasks ( ...
   跳步（todo→done）→ is_error=True 不能从 todo 直接改为 done；允许：['doing']
 
 --- 统计 / 资源 / 提示 ---
-  stats = {'done': 0, 'todo': 2, 'doing': 1}
+  stats = {'doing': 1, 'todo': 2}
   tasks://doing = [{"id":1,...}]
 ```
 

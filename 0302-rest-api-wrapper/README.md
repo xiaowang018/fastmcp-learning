@@ -1,7 +1,7 @@
 # 0302 · 实战：把 REST API 包装成 MCP 工具
 
 > 目标：不依赖外网和密钥，用本地 mock API 走通「HTTP → MCP」的包装层，重点讲错误映射与重试。
-> 难度 ★★★★ ｜ 前置：0202 0206 ｜ 依赖：`uv sync --group api` ｜ 端口：8107（mock，手动）｜ 预计：40 分钟
+> 难度 ★★★★ ｜ 前置：0202 0206（概念）｜ 依赖：api 组（推荐 `uv sync --all-groups`）｜ 端口：8107（mock，手动）｜ 预计：40 分钟
 
 ## 1. 你会学到
 
@@ -17,6 +17,9 @@ cd 0302-rest-api-wrapper
 uv sync --group api
 uv run python client.py
 ```
+
+> `uv sync --group api` 会把环境精确同步成「默认 + api」，之前装的 `apps` 组会被移除。
+> 想一次装齐：`uv sync --all-groups`（根 README §0.4 的推荐做法）。
 
 预期输出：
 

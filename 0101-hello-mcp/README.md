@@ -94,6 +94,8 @@ FastMCP 在注册时做了四件事：
 
 所以**改类型注解，就是在改模型看到的工具契约**。这是后面所有案例的基础。
 
+一步步的调用时序（initialize → tools/list → tools/call → result）见 [`docs/00-mcp-in-10-minutes.md`](../docs/00-mcp-in-10-minutes.md) 第 3 节的时序图。
+
 ## 5. 三种验证方式
 
 ### 方式一：代码（最快）
@@ -110,7 +112,9 @@ uv run python client.py
 uv run fastmcp dev inspector server.py
 ```
 
-浏览器会打开 MCP Inspector：左侧能看到 `add` 工具和 `info://server` 资源，点 `Run Tool` 填入 `{"a": 1, "b": 2}` 即可看到结果。第一次运行会通过 `npx` 下载 Inspector，需要网络。
+浏览器会打开 MCP Inspector：左侧能看到 `add` 工具和 `info://server` 资源，点 `Run Tool` 填入 `{"a": 1, "b": 2}` 即可看到结果。
+
+第一次运行会通过 `npx` 下载 Inspector：需要 **Node.js 18+** 与网络。没装 Node 时这一步会失败，改用方式一，或执行 `uv run fastmcp inspect server.py`，不影响后面的学习。
 
 ### 方式三：裸 JSON-RPC（最接近真相）
 
@@ -124,6 +128,8 @@ printf '%s\n' \
   | uv run python server.py 2>/dev/null | grep -a jsonrpc
 ```
 
+> Windows：以上命令在 **Git Bash** 中可直接运行；PowerShell 没有 `printf` / `grep`，请直接用方式一，或在 Git Bash 里做这一步。不要因为这条命令报错就怀疑服务器坏了。
+
 会得到（已截断）：
 
 ```json
@@ -135,18 +141,35 @@ printf '%s\n' \
 
 ## 6. 接入真实宿主
 
-Claude Desktop（Windows 配置文件在 `%APPDATA%\Claude\claude_desktop_config.json`）：
+Claude Desktop（Windows 配置文件在 `%APPDATA%\Claude\claude_desktop_config.json`，macOS 在 `~/Library/Application Support/Claude/claude_desktop_config.json`）。把 `<仓库目录>` 换成你 clone 下来的绝对路径，例如 `D:/code/fastmcp-learning`：
 
 ```json
 {
   "mcpServers": {
     "hello-mcp": {
-      "command": "C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning/.venv/Scripts/python.exe",
-      "args": ["C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning/0101-hello-mcp/server.py"]
+      "command": "<仓库目录>/.venv/Scripts/python.exe",
+      "args": ["<仓库目录>/0101-hello-mcp/server.py"]
     }
   }
 }
 ```
+
+macOS / Linux 把 `command` 换成 `<仓库目录>/.venv/bin/python`，其余相同。
+
+跨平台写法（不写死解释器）：
+
+```json
+{
+  "mcpServers": {
+    "hello-mcp": {
+      "command": "uv",
+      "args": ["--directory", "<仓库目录>", "run", "python", "0101-hello-mcp/server.py"]
+    }
+  }
+}
+```
+
+> `<仓库目录>` 是占位符，**不要原样粘贴**；没替换时宿主会报找不到文件。
 
 改完重启宿主，在对话框里说「用 add 算一下 2 加 3」，应该能看到工具调用卡片。
 

@@ -4,6 +4,16 @@
 
 ## 1. 环境与安装
 
+### `uv: command not found` / `无法将“uv”项识别为 cmdlet...`
+
+```text
+原因：uv 没装，或装完没有重开终端（PATH 未刷新）
+解决：
+  1) 按 README §0.2 安装 uv（Windows PowerShell / macOS / Linux 各一条）
+  2) 关掉终端再开一个新的
+  3) uv --version 能输出版本即可
+```
+
 ### `ModuleNotFoundError: No module named 'fastmcp'`
 
 ```bash
@@ -23,13 +33,22 @@ uv run python -c "import fastmcp; print('ok')"
 ### `No module named 'fastapi'` / `'prefab_ui'`
 
 ```bash
-uv sync --group api --group apps
-# 或只装需要的
+uv sync --all-groups
+# 或只装需要的（注意会移除另一组）
 uv sync --group api
 uv sync --group apps
 ```
 
 注意：`uv sync --group apps` 会把环境精确同步成「默认 + apps」，之前装的 `api` 会被移除。
+
+### `verify_all.py` 跑到 0206 报 `No module named 'fastapi'`
+
+```text
+现象：前面案例都 OK，到 0206/0302/0304 显示 FAIL，traceback 指向 fastapi / prefab_ui
+原因：只装了默认组，api/apps 组不在环境里
+解决：uv sync --all-groups 后重跑；只想验基础篇用
+     uv run python scripts/verify_all.py --only 01
+```
 
 ## 2. 启动与连接
 
@@ -86,6 +105,13 @@ curl -i http://127.0.0.1:8101/health
 ```text
 原因：Windows 上用了 SelectorEventLoop
 解决：保持默认 Proactor；不要设置 WindowsSelectorEventLoopPolicy
+```
+
+### Windows 提示 `printf` / `grep` 不是内部或外部命令
+
+```text
+原因：0101 的裸 JSON-RPC 示例用的是 Unix 命令，PowerShell / cmd 没有
+解决：改用 Git Bash 执行；或跳过这一步，用 client.py / fastmcp inspect 验证
 ```
 
 ## 4. 工具与 schema
@@ -212,7 +238,14 @@ result.structured_content["words"]  # 原始字典
 
 ### Inspector 打不开
 
-`fastmcp dev inspector` 依赖 `npx`，首次需要网络。也可以直接连 HTTP：
+`fastmcp dev inspector` 依赖 `npx`，需要 **Node.js 18+** 与网络。
+
+```text
+先确认：node --version、npx --version
+没装 Node：跳过 Inspector，用 client.py 或下面的 inspect 命令
+```
+
+也可以直接连 HTTP：
 
 ```bash
 uv run fastmcp inspect http://127.0.0.1:8101/mcp

@@ -16,6 +16,10 @@ Host（Claude Desktop / Cursor / 你的 Agent）
 
 一个 Host 可以连多个 Server；一个 Server 也可以被多个 Host 连。
 
+<img src="images/01-roles-and-transports.svg" width="880" alt="Host 内置 Client，通过 stdio 子进程或 HTTP 连接 MCP Server；Server 只声明工具、资源、提示能力">
+
+*图：三角色与两种传输。Server 只声明能力，Host 决定调不调用，Client 负责协议。*
+
 ## 2. 三个核心原语
 
 | 原语 | 语义 | 例子 | 谁发起 |
@@ -29,6 +33,10 @@ Host（Claude Desktop / Cursor / 你的 Agent）
 - 要「做事」→ Tool
 - 要「取数」→ Resource
 - 要「固定一段指令」→ Prompt
+
+<img src="images/02-three-primitives.svg" width="880" alt="三原语判别：Tool 做事由模型发起，Resource 取数由宿主或用户发起，Prompt 提供固定指令模板由用户发起">
+
+*图：三原语的判别只需要一句话——做事、取数、给指令。*
 
 ## 3. 一次工具调用的完整链路
 
@@ -48,6 +56,10 @@ Host（Claude Desktop / Cursor / 你的 Agent）
 - 参数被拒 → 第 5 步（schema/校验）
 - 返回看不懂 → 第 6 步（content vs structuredContent）
 - 连不上 → 第 1 步（传输/鉴权）
+
+<img src="images/03-call-sequence.svg" width="880" alt="一次工具调用的时序：initialize 协商、tools/list 取 schema、模型生成参数、tools/call、服务端校验执行并把结果返回">
+
+*图：一次 tools/call 的五步链路，以及每一步对应的常见症状。*
 
 ## 4. 传输：stdio 与 HTTP
 

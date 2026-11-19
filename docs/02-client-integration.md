@@ -1,6 +1,6 @@
 # 接入宿主：Inspector / Claude Desktop / Cursor / Claude Code
 
-> 目标：让本仓库的服务器出现在你常用的 MCP 客户端里。以下路径以 Windows 为例，其他平台替换为对应路径。
+> 目标：让本仓库的服务器出现在你常用的 MCP 客户端里。示例以 Windows 为主，同时给出 macOS / Linux 的 PATH 写法。
 
 ## 1. 先确认服务器能独立运行
 
@@ -21,16 +21,19 @@ uv run fastmcp inspect 0101-hello-mcp/server.py
 
 ## 2. 绝对路径准备
 
-宿主不会继承你当前终端的工作目录，配置里必须写**绝对路径**：
+宿主不会继承你当前终端的工作目录，配置里必须写**绝对路径**。本文统一用占位符 `<仓库目录>`：
 
 ```text
-项目根：C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning
-Python：C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning/.venv/Scripts/python.exe
+<仓库目录> = 你克隆/解压后仓库根目录的绝对路径，例如 D:/code/fastmcp-learning
+Windows 解释器：<仓库目录>/.venv/Scripts/python.exe
+macOS / Linux ：<仓库目录>/.venv/bin/python
 ```
 
-Windows 路径用正斜杠 `/` 最稳，避免 JSON 转义问题。
+- 尖括号是占位符，**不要原样粘贴**，必须换成你自己的真实路径；
+- 取路径：Windows PowerShell 用 `(Get-Location).Path`，Git Bash / macOS / Linux 用 `pwd`；
+- Windows 路径写正斜杠 `/` 最稳，避免 JSON 转义问题。
 
-## 3. MCP Inspector（最快）
+## 3. MCP Inspector（最直观，需 Node.js）
 
 ```bash
 cd 0101-hello-mcp
@@ -41,14 +44,15 @@ uv run fastmcp dev inspector server.py
 - 点工具、填参数、Run，右侧看结果与 `structuredContent`；
 - 适合调试 schema、错误文案、资源 MIME。
 
-第一次运行会通过 `npx` 下载 Inspector，需要网络。
+第一次运行会通过 `npx` 下载 Inspector：需要 **Node.js 18+** 与网络。没装 Node 时这一步会失败，直接用 `client.py` 或 `uv run fastmcp inspect server.py`，不影响后面的学习。
 
 ## 4. Claude Desktop
 
 配置文件：
 
 ```text
-%APPDATA%\Claude\claude_desktop_config.json
+Windows：%APPDATA%\Claude\claude_desktop_config.json
+macOS  ：~/Library/Application Support/Claude/claude_desktop_config.json
 ```
 
 内容：
@@ -57,14 +61,31 @@ uv run fastmcp dev inspector server.py
 {
   "mcpServers": {
     "hello-mcp": {
-      "command": "C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning/.venv/Scripts/python.exe",
+      "command": "<仓库目录>/.venv/Scripts/python.exe",
       "args": [
-        "C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning/0101-hello-mcp/server.py"
+        "<仓库目录>/0101-hello-mcp/server.py"
       ]
     }
   }
 }
 ```
+
+macOS / Linux 把 `command` 换成 `<仓库目录>/.venv/bin/python`，其余相同。
+
+更省事的跨平台写法（不写死解释器）：
+
+```json
+{
+  "mcpServers": {
+    "hello-mcp": {
+      "command": "uv",
+      "args": ["--directory", "<仓库目录>", "run", "python", "0101-hello-mcp/server.py"]
+    }
+  }
+}
+```
+
+> `<仓库目录>` 没替换时，宿主通常报「找不到文件」，这是最常见的复制失败原因。
 
 步骤：
 
@@ -94,7 +115,7 @@ uv run fastmcp dev inspector server.py
       "command": "uv",
       "args": [
         "--directory",
-        "C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning",
+        "<仓库目录>",
         "run",
         "python",
         "0104-tool-errors/server.py"
@@ -111,17 +132,19 @@ uv run fastmcp dev inspector server.py
 命令行安装：
 
 ```bash
-cd C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning
+cd <仓库目录>
 fastmcp install claude-code 0101-hello-mcp/server.py --name hello-mcp
 ```
 
-或手动：
+或手动（Windows）：
 
 ```bash
 claude mcp add hello-mcp -- \
-  "C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning/.venv/Scripts/python.exe" \
-  "C:/Users/Administrator/WorkBuddy/2026-11-18-10-44-56/fastmcp-learning/0101-hello-mcp/server.py"
+  "<仓库目录>/.venv/Scripts/python.exe" \
+  "<仓库目录>/0101-hello-mcp/server.py"
 ```
+
+macOS / Linux 把解释器换成 `<仓库目录>/.venv/bin/python`。
 
 验证：
 
@@ -179,7 +202,7 @@ curl http://127.0.0.1:8101/health
 ```text
 1. 终端能跑吗？        uv run python server.py / fastmcp inspect
 2. 路径是绝对路径吗？  宿主不继承 cwd
-3. 解释器对吗？        .venv/Scripts/python.exe，不是系统 Python
+3. 解释器对吗？        .venv/Scripts/python.exe（Windows）或 .venv/bin/python（macOS/Linux），不是系统 Python
 4. JSON 合法吗？       用 json.loads 校验，不要有尾随逗号
 5. 宿主重启了吗？      托盘退出再开
 6. 看宿主日志           Claude Desktop: %APPDATA%\Claude\logs

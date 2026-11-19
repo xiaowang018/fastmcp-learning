@@ -1,0 +1,67 @@
+<svg viewBox="0 0 960 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">MCP 三个核心原语的判别</title>
+  <desc id="desc">Tool 做事、由模型发起；Resource 取数、由 Host 或用户发起；Prompt 提供固定指令模板、由用户发起。</desc>
+  <style>
+    .bg { fill: #ffffff; stroke: #d0d7de; }
+    .card { fill: #f6f8fa; stroke: #d0d7de; }
+    .h1 { fill: #0969da; }
+    .h2 { fill: #1a7f37; }
+    .h3 { fill: #8250df; }
+    .strip { fill: #fff8c5; stroke: #d4a72c; }
+    .t { fill: #1f2328; }
+    .m { fill: #59636e; }
+    .w { fill: #ffffff; }
+    text { font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0d1117; stroke: #3d444d; }
+      .card { fill: #161b22; stroke: #3d444d; }
+      .h1 { fill: #1f6feb; }
+      .h2 { fill: #238636; }
+      .h3 { fill: #8957e5; }
+      .strip { fill: #2d2612; stroke: #9e6a03; }
+      .t { fill: #e6edf3; }
+      .m { fill: #9198a1; }
+      .w { fill: #ffffff; }
+    }
+  </style>
+
+  <rect class="bg" x="1" y="1" width="958" height="358" rx="18"/>
+  <text class="t" x="40" y="48" font-size="22" font-weight="700">三个核心原语：Tool / Resource / Prompt</text>
+  <text class="m" x="40" y="74" font-size="13">判断标准只有一句话：做事、取数、给指令</text>
+
+  <rect class="card" x="30" y="98" width="280" height="186" rx="12"/>
+  <rect class="h1" x="30" y="98" width="280" height="44" rx="12"/>
+  <rect class="h1" x="30" y="128" width="280" height="14"/>
+  <text class="w" x="170" y="127" font-size="16" font-weight="700" text-anchor="middle">Tool 工具</text>
+  <text class="m" x="52" y="170" font-size="11">语义</text>
+  <text class="t" x="52" y="190" font-size="13">执行动作，可能有副作用</text>
+  <text class="m" x="52" y="220" font-size="11">谁发起</text>
+  <text class="t" x="52" y="240" font-size="13">模型</text>
+  <text class="m" x="52" y="268" font-size="11">本仓库案例</text>
+  <text class="t" x="52" y="286" font-size="13">0102 – 0104</text>
+
+  <rect class="card" x="340" y="98" width="280" height="186" rx="12"/>
+  <rect class="h2" x="340" y="98" width="280" height="44" rx="12"/>
+  <rect class="h2" x="340" y="128" width="280" height="14"/>
+  <text class="w" x="480" y="127" font-size="16" font-weight="700" text-anchor="middle">Resource 资源</text>
+  <text class="m" x="362" y="170" font-size="11">语义</text>
+  <text class="t" x="362" y="190" font-size="13">读取数据，通常只读</text>
+  <text class="m" x="362" y="220" font-size="11">谁发起</text>
+  <text class="t" x="362" y="240" font-size="13">Host / 用户</text>
+  <text class="m" x="362" y="268" font-size="11">本仓库案例</text>
+  <text class="t" x="362" y="286" font-size="13">0105</text>
+
+  <rect class="card" x="650" y="98" width="280" height="186" rx="12"/>
+  <rect class="h3" x="650" y="98" width="280" height="44" rx="12"/>
+  <rect class="h3" x="650" y="128" width="280" height="14"/>
+  <text class="w" x="790" y="127" font-size="16" font-weight="700" text-anchor="middle">Prompt 提示</text>
+  <text class="m" x="672" y="170" font-size="11">语义</text>
+  <text class="t" x="672" y="190" font-size="13">可复用的消息模板</text>
+  <text class="m" x="672" y="220" font-size="11">谁发起</text>
+  <text class="t" x="672" y="240" font-size="13">用户</text>
+  <text class="m" x="672" y="268" font-size="11">本仓库案例</text>
+  <text class="t" x="672" y="286" font-size="13">0106</text>
+
+  <rect class="strip" x="30" y="304" width="900" height="38" rx="10"/>
+  <text class="t" x="480" y="328" font-size="13" text-anchor="middle">要「做事」→ Tool ｜ 要「取数」→ Resource ｜ 要「固定一段指令」→ Prompt</text>
+</svg>

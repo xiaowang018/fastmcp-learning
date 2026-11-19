@@ -1,7 +1,7 @@
 # 0206 · 从 FastAPI / OpenAPI 生成 MCP 服务器
 
 > 目标：先用自动转换看清「镜像 REST」的噪声，再用 `RouteMap` 与手写包装把它收敛成给模型用的工具。
-> 难度 ★★★ ｜ 前置：0205 ｜ 依赖：`uv sync --group api` ｜ 端口：无 ｜ 预计：35 分钟
+> 难度 ★★★ ｜ 前置：0205 ｜ 依赖：api 组（推荐 `uv sync --all-groups`）｜ 端口：无 ｜ 预计：35 分钟
 
 ## 1. 你会学到
 
@@ -17,6 +17,9 @@ cd 0206-openapi-fastapi
 uv sync --group api        # 安装 fastapi / uvicorn
 uv run python client.py
 ```
+
+> `uv sync --group api` 会把环境精确同步成「默认 + api」，之前装的 `apps` 组会被移除。
+> 想一次装齐：`uv sync --all-groups`（根 README §0.4 的推荐做法）。
 
 预期输出（截断）：
 

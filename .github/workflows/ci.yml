@@ -9,26 +9,77 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    name: test (${{ matrix.os }} · py${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.13"]
+        exclude:
+          - os: windows-latest
+            python: "3.11"
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
+      UV_LINK_MODE: copy
+      UV_PYTHON: ${{ matrix.python }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: astral-sh/setup-uv@v5
         with:
           version: "latest"
+          enable-cache: true
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python }}
 
       - name: Install dependencies
-        run: uv sync --group api --group apps
+        run: uv sync --all-groups --frozen --python ${{ matrix.python }}
 
       - name: Lint
         run: uv run ruff check .
 
       - name: Test
         run: uv run pytest -q
+
+      - name: Verify all clients
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.13'
+        run: uv run python scripts/verify_all.py
+
+  docs:
+    name: docs checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No machine-specific absolute paths
+        run: |
+          if grep -rn --include="*.md" -E "C:/Users/|/Users/[A-Za-z]+/|/home/[A-Za-z]+/" . ; then
+            echo "::error::文档里出现了本机绝对路径，请改用 <仓库目录> 占位符"
+            exit 1
+          fi
+
+      - name: SVG files are well-formed
+        run: |
+          python - <<'PY'
+          import glob
+          import xml.etree.ElementTree as ET
+
+          paths = sorted(glob.glob("docs/images/*.svg"))
+          if not paths:
+              raise SystemExit("没有找到 docs/images/*.svg")
+          for path in paths:
+              ET.parse(path)
+              print("OK", path)
+          PY

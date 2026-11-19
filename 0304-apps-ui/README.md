@@ -1,7 +1,7 @@
 # 0304 · MCP Apps：工具返回可交互 UI
 
 > 目标：理解 `app=True` 的渲染链路，并为「宿主不支持 Apps」准备一条 HTML 降级路径。
-> 难度 ★★★★ ｜ 前置：0103 0201 ｜ 依赖：可选 `uv sync --group apps` ｜ 端口：8080（dev apps）/ 随机（测试）｜ 预计：35 分钟
+> 难度 ★★★★ ｜ 前置：0103 0201 ｜ 依赖：apps 组（推荐 `uv sync --all-groups`）｜ 端口：8080（dev apps）/ 随机（测试）｜ 预计：35 分钟
 
 ## 1. 你会学到
 
@@ -17,6 +17,9 @@ cd 0304-apps-ui
 uv sync --group apps     # 安装 prefab-ui
 uv run python client.py
 ```
+
+> `uv sync --group apps` 会把环境精确同步成「默认 + apps」，之前装的 `api` 组会被移除。
+> 想一次装齐：`uv sync --all-groups`（根 README §0.4 的推荐做法）。
 
 预期输出：
 

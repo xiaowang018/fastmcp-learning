@@ -160,7 +160,7 @@ uv run pytest -q -m apps                      # 只跑 Apps 案例（需装 apps
 
 **④ 用 `sleep` 等 HTTP 服务就绪**
 
-用 `wait_healthy` / `serve_http` 轮询，避免 flaky。
+用 `serve_http` 轮询启动与端口，避免 flaky。
 
 **⑤ 把 `print` 当断言**
 

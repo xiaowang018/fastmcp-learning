@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 import time
@@ -57,7 +58,7 @@ def main() -> int:
                 encoding="utf-8",
                 errors="replace",
                 timeout=args.timeout,
-                env={**__import__("os").environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"},
+                env={**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"},
             )
         except subprocess.TimeoutExpired:
             print("超时")

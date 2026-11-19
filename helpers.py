@@ -1,10 +1,9 @@
 """全仓共享测试工具（由 pytest 的 pythonpath = ["."] 暴露给各案例测试）。
 
-四个约定：
+三个约定：
 1. 数字开头的案例目录不能 import，统一用 load_server() 按绝对路径加载。
 2. 需要真实 stdio 通路的测试，直接 Client(Path(case) / "server.py")。
-3. HTTP 测试用 free_port() 取空闲端口，再用 wait_healthy() 轮询 /health。
-4. 子进程统一 UTF-8，避免 Windows cp936 造成中文乱码。
+3. HTTP 测试用 serve_http / serve_asgi，绑 port=0 由操作系统分配端口。
 """
 
 from __future__ import annotations
@@ -13,16 +12,14 @@ import asyncio
 import contextlib
 import importlib.util
 import os
-import socket
 import sys
-import time
 from collections.abc import AsyncIterator
 from pathlib import Path
 from types import ModuleType
-from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parent
 
+# Windows 控制台默认 cp936，会让中文断言和 print 出错；子进程统一 UTF-8。
 SUBPROCESS_ENV = {
     **os.environ,
     "PYTHONUTF8": "1",
@@ -62,46 +59,6 @@ def load_server(case: str, filename: str = "server.py") -> ModuleType:
             with contextlib.suppress(ValueError):
                 sys.path.remove(case_dir)
     return module
-
-
-def free_port() -> int:
-    """取一个当前空闲的本地端口（仅用于串行测试，仍有极小竞态）。"""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.bind(("127.0.0.1", 0))
-        return int(sock.getsockname()[1])
-
-
-def wait_healthy(url: str, timeout: float = 10.0, interval: float = 0.1) -> None:
-    """轮询一个 HTTP 端点，直到返回 200；禁止用 sleep 猜启动时间。"""
-    deadline = time.monotonic() + timeout
-    last_error: Exception | None = None
-    while time.monotonic() < deadline:
-        try:
-            with urlopen(url, timeout=1) as response:
-                if response.status == 200:
-                    return
-        except Exception as exc:  # 服务未起、连接被拒都属正常
-            last_error = exc
-        time.sleep(interval)
-    raise TimeoutError(f"服务未在 {timeout}s 内就绪：{url}（最后一次错误：{last_error}）")
-
-
-async def wait_healthy_async(url: str, timeout: float = 10.0, interval: float = 0.1) -> None:
-    """wait_healthy 的异步版本：在事件循环里不能调用同步 urlopen，否则会阻塞服务。"""
-    import httpx2
-
-    deadline = time.monotonic() + timeout
-    last_error: Exception | None = None
-    async with httpx2.AsyncClient() as client:
-        while time.monotonic() < deadline:
-            try:
-                response = await client.get(url, timeout=1)
-                if response.status_code == 200:
-                    return
-            except Exception as exc:
-                last_error = exc
-            await asyncio.sleep(interval)
-    raise TimeoutError(f"服务未在 {timeout}s 内就绪：{url}（最后一次错误：{last_error}）")
 
 
 @contextlib.asynccontextmanager

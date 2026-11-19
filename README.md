@@ -1,10 +1,12 @@
 # FastMCP 4.2 从 0 到 1
 
+[![CI](https://github.com/xiaowang018/fastmcp-learning/actions/workflows/ci.yml/badge.svg)](https://github.com/xiaowang018/fastmcp-learning/actions)
+
 一套能跑、能测、能查的中文 FastMCP 学习案例库：**22 个编号目录，一个目录一个案例**，每个案例都有代码、md 教程、一键自测和 pytest 测试。
 
 - 版本基线：**FastMCP 4.2.1**（Python ≥ 3.11），代码按 4.x API 编写，文档标注 2.x / 3.x 差异。
 - 学习方式：从 `0101` 顺着做，或按角色跳读（见「学习路径」）。
-- 质量保证：`uv run pytest` 91 个测试全绿；`uv run python scripts/verify_all.py` 22/22 客户端可跑。
+- 质量保证：`uv run pytest` 全部测试通过（当前版本 91 个）；`uv run python scripts/verify_all.py` 22/22 客户端可跑。
 - 零外部依赖：核心案例不联网、不需要 API key；REST 案例用本地 mock，Apps 案例有 HTML 降级。
 
 ## 5 分钟开始
@@ -34,7 +36,7 @@ uv sync --group api --group apps    # 0206/0302 需要 api，0304 需要 apps
 fastmcp-learning/
 ├─ README.md                 # 本文件：路线图 + 索引
 ├─ pyproject.toml            # 统一依赖与 pytest 配置
-├─ helpers.py                # load_server / free_port / serve_http / serve_asgi
+├─ helpers.py                # load_server / serve_asgi / serve_http
 ├─ docs/                     # 6 篇横向文档
 ├─ scripts/verify_all.py     # 逐个跑 22 个 client.py
 ├─ 01xx-*                    # 基础篇 9 个
@@ -88,7 +90,7 @@ fastmcp-learning/
 | [0301](0301-sqlite-crud/README.md) | SQLite 待办 | lifespan + 锁、分页、状态机、资源 | 01 篇 + 0202 | — |
 | [0302](0302-rest-api-wrapper/README.md) | REST 包装 | httpx2、超时/重试、错误映射 | 0202 0206 | `--group api`，8107 |
 | [0303](0303-docs-kb/README.md) | 知识库 | Resource + Tool + Prompt、可解释检索 | 0105 0106 0109 | — |
-| [0304](0304-apps-ui/README.md) | MCP Apps | `app=True`、Prefab、HTML 降级 | 0103 0201 | `--group apps`，8108 |
+| [0304](0304-apps-ui/README.md) | MCP Apps | `app=True`、Prefab、HTML 降级 | 0103 0201 | `--group apps`，8080 |
 | [0305](0305-deploy-install/README.md) | 部署与安装 | fastmcp.json、CLI install、Docker | 0201 0204 | 8109 |
 | [0306](0306-agent-host/README.md) | 最小 Host | ClientGroup、确定性 planner、错误恢复 | 0109 0301 0302 | — |
 
@@ -142,7 +144,7 @@ cd 0201-http-server && uv run python server.py
 
 | 项 | 约定 |
 |---|---|
-| 端口 | 手动运行用固定端口（8101/8104/8107/8108/8109）；测试用 `port=0` |
+| 端口 | 手动运行用固定端口：8101=0201、8104=0204、8107=0302 mock、8108=0108、8109=0305；0304 的 `fastmcp dev apps` 用 8080；测试一律 `port=0` |
 | 就绪判定 | 轮询 `/health`，不用 `sleep` |
 | 编码 | 子进程 `PYTHONUTF8=1` / `PYTHONIOENCODING=utf-8` |
 | stdout | 服务端日志只走 stderr；stdout 只能有 JSON-RPC |
@@ -164,11 +166,11 @@ cd 0201-http-server && uv run python server.py
 ## 验证状态
 
 ```text
-uv run pytest -q                          → 91 passed
+uv run pytest -q                          → 全部通过（当前版本 91 个）
 uv run python scripts/verify_all.py       → 22/22 OK
 uv run fastmcp inspect 0101-hello-mcp/... → HelloMCP, 1 tool, 1 resource
 ```
 
 ## 许可与致谢
 
-案例代码可自由用于学习与内部培训。FastMCP 由 Prefect 维护，文档见 <https://gofastmcp.com>。
+代码以 MIT 发布（见 [LICENSE](LICENSE)），可自由用于学习与培训。FastMCP 由 Prefect 维护，文档见 <https://gofastmcp.com>。
